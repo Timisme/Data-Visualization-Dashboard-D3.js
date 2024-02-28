@@ -15,7 +15,7 @@ This project is a data visualization dashboard developed using Django, PostgreSQ
 
 ### Prerequisites
 
-- Python 3.x
+- Python 3.10
 - Django
 - PostgreSQL
 - D3.js
