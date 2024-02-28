@@ -1,6 +1,7 @@
 import json
 import os
-
+from datetime import datetime
+from django.db import transaction
 from data_visualization.models import DataPoint
 from django.core.management.base import BaseCommand, CommandError
 
@@ -22,28 +23,39 @@ class Command(BaseCommand):
                 'File "{}" does not exist.'.format(json_file_path))
 
         # Open and load the JSON file
-        with open(json_file_path, 'r') as file:
+        with open(json_file_path, 'r', encoding="utf-8") as file:
             data = json.load(file)
 
             # Iterate over each entry in the JSON data
+            instances = []
             for entry in data:
                 try:
                     # Create and save a new DataPoint instance
-                    #TODO: preprocessing "added" = "January, 20 2017 03:51:25", "published" = "January, 09 2017 00:00:00"
-                    DataPoint.objects.create(
-                        intensity=entry['intensity'],
-                        likelihood=entry['likelihood'],
-                        relevance=entry['relevance'],
-                        year=entry['year'],
-                        country=entry['country'],
-                        topics=entry['topics'],
-                        region=entry['region'],
-                        city=entry['city']
-                    )
+                    field_names = [field.name for field in DataPoint._meta.get_fields() if field.name != "id"]
+                    kwargs = {}
+                    for field_name in field_names:
+                        # turn string datetime into datetime object
+                        if field_name in ["added", "published"]:
+                            if entry[field_name] != "":
+                                value = datetime.strptime(entry[field_name], "%B, %d %Y %H:%M:%S")
+                            else:
+                                value = None
+                        else:
+                            value = entry[field_name] if entry[field_name] != "" else None
+
+                        kwargs[field_name] = value
+
+                    instances.append(DataPoint(**kwargs))
                 except Exception as e:
                     # If an error occurs, print it and skip to the next entry
                     print(f"Error loading entry: {e}")
                     continue
 
-        self.stdout.write(self.style.SUCCESS(
-            'Successfully loaded data from "{}"'.format(json_file_path)))
+            #TODO: use bulk create instead (skip existing ones)
+            with transaction.atomic():
+                DataPoint.objects.all().delete()
+                DataPoint.objects.bulk_create(instances)
+
+        self.stdout.write(
+            self.style.SUCCESS('Successfully loaded data from "{}"'.format(json_file_path))
+        )
