@@ -29,6 +29,7 @@ class Command(BaseCommand):
             for entry in data:
                 try:
                     # Create and save a new DataPoint instance
+                    #TODO: preprocessing "added" = "January, 20 2017 03:51:25", "published" = "January, 09 2017 00:00:00"
                     DataPoint.objects.create(
                         intensity=entry['intensity'],
                         likelihood=entry['likelihood'],

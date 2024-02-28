@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Caches
+*.cache
+*.log
+
+# Environment variables
+.env
+
+# Static files
+/staticfiles/
+
+# Media files
+/media/
+
+# Secret key file
+*.key
+
+# Database files
+*.sqlite3
+*.db
+
+# Compiled Python bytecode
+*.pyc
+
+# macOS
+.DS_Store
+
+# Virtual environment
+venv/

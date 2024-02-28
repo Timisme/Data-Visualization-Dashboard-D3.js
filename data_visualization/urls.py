@@ -5,6 +5,6 @@ from . import views
 
 urlpatterns = [
 
-    path('data-points/', DataPointList.as_view(), name='data-point-list'),
-    path('api/data/', views.DataListView.as_view(), name='data-list'),
+    path('data-points/', views.DataPointList.as_view(), name='data-point-list'),
+    path('api/data/', views.DataPointList.as_view(), name='data-list'),
 ]

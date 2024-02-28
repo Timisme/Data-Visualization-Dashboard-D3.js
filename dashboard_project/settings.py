@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'data_visualization'
+    'data_visualization',
     'rest_framework'
 ]
 
@@ -86,11 +86,11 @@ WSGI_APPLICATION = 'dashboard_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mona',
-        'USER': 'lisa',
-        'PASSWORD': '1234',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'password',
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '5432',
     }
 }
 
@@ -131,11 +131,11 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-   STATICFILES_DIRS = [
-       BASE_DIR / "static",
-       '/var/www/static/',
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+    '/var/www/static/',
 
-   ]
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
