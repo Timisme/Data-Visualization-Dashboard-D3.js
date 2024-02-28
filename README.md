@@ -47,21 +47,14 @@ pip install -r requirements.txt
 
 - Create a new PostgreSQL database.
 - Update the `DATABASES` configuration in `settings.py`  (line number 86 to 94)
-<<<<<<< HEAD
-=======
-
->>>>>>> 0600b8906276ab9d735ba32b7b4dee6bfe09c83c
 
 4. **Run migrations**
 
 
-<<<<<<< HEAD
-=======
 python manage.py makemigrations
 python manage.py migrate
 
 
->>>>>>> 0600b8906276ab9d735ba32b7b4dee6bfe09c83c
 5. **Load the dataset**
 
 - Use the provided script to load the dataset into your database.
@@ -88,14 +81,10 @@ Visit `http://localhost:8000` in your browser to view the dashboard.
 - API endpoints can be accessed for custom data retrieval.
 
 
-<<<<<<< HEAD
-Document your API endpoints here, with examples of usage (i will add this here shortly).
-=======
 ## API Reference
 
 Document your API endpoints here, with examples of usage (i will add this here shortly).
 
->>>>>>> 0600b8906276ab9d735ba32b7b4dee6bfe09c83c
 
 ## Contact
 
