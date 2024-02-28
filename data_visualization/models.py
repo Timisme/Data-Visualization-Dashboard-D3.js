@@ -6,7 +6,7 @@ class DataPoint(models.Model):
     intensity = models.IntegerField()
     sector = models.CharField(max_length=64, null=True)
     topic = models.CharField(max_length=64, null=True)
-    insight = models.CharField(max_length=128, null=True)
+    insight = models.CharField(max_length=256, null=True)
     url = models.URLField()
     region = models.CharField(max_length=64, null=True)
     start_year = models.IntegerField(null=True)
