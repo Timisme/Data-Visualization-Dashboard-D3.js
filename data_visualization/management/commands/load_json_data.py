@@ -50,6 +50,8 @@ class Command(BaseCommand):
                                     value = entry[field_name][:100]
                                 else:
                                     value = entry[field_name]
+                            elif entry[field_name]:
+                                value = entry[field_name]
                             else:
                                 value = None
 
