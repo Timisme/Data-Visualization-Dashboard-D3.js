@@ -4,4 +4,4 @@ from .models import DataPoint
 class DataPointFilter(django_filters.FilterSet):
     class Meta:
         model = DataPoint
-        fields = ['end_year', 'sector', 'region', 'country', 'pestle', 'source']  # Define fields to filter on
+        fields = ['end_year', 'sector', 'region', 'country', 'pestle']  #TODO: ADD 'source'

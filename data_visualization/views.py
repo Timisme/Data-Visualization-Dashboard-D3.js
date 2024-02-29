@@ -18,6 +18,27 @@ class DataPointList(APIView):
 
 class Chart1DataView(APIView):
     def get(self, request, format=None):
+        queryset = DataPoint.objects.exclude(country__isnull=True)
+        filter = DataPointFilter(request.GET, queryset=queryset)
+        queryset = filter.qs.values('country').annotate(count=Count('id'))
+        return Response(list(queryset))
+
+class Chart2DataView(APIView):
+    def get(self, request, format=None):
+        queryset = DataPoint.objects.exclude(sector__isnull=True)
+        filter = DataPointFilter(request.GET, queryset=queryset)
+        queryset = filter.qs.values('sector').annotate(count=Count('id'))
+        return Response(list(queryset))
+
+class Chart3DataView(APIView):
+    def get(self, request, format=None):
+        queryset = DataPoint.objects.exclude(topic__isnull=True)
+        filter = DataPointFilter(request.GET, queryset=queryset)
+        queryset = filter.qs.values('topic').annotate(count=Count('id'))
+        return Response(list(queryset))
+
+class Chart4DataView(APIView):
+    def get(self, request, format=None):
         # queryset = DataPoint.objects.exclude(country__isnull=True).exclude(topic__isnull=True)
         # queryset = queryset.values('country', 'topic').annotate(count=Count('id'))
         queryset = DataPoint.objects.exclude(country__isnull=True)
@@ -26,6 +47,17 @@ class Chart1DataView(APIView):
         queryset = filtered_queryset.values('country').annotate(count=Count('id'))
         return Response(list(queryset))
 
+
+def dashboard(request):
+    filter_fields = DataPointFilter.Meta.fields
+    filter_config = {}
+    for field_name in filter_fields:
+        filter_config[field_name] = list(DataPoint.objects.values_list(field_name, flat=True).distinct())
+    return render(request, "dashboard.html", context={
+        "filter_config": filter_config
+    })
+
+'''not used'''
 def get(self, request, format=None):
     queryset = DataPoint.objects.all()
 
@@ -38,12 +70,3 @@ def get(self, request, format=None):
 
     serializer = DataPointSerializer(queryset, many=True)
     return Response(serializer.data)
-
-def dashboard(request):
-    filter_fields = DataPointFilter.Meta.fields
-    filter_config = {}
-    for field_name in filter_fields:
-        filter_config[field_name] = list(DataPoint.objects.values_list(field_name, flat=True).distinct())
-    return render(request, "dashboard.html", context={
-        "filter_config": filter_config
-    })
