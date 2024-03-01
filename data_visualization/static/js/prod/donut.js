@@ -13,7 +13,7 @@ async function visualizeDonutChart(data, element){
         .value(d => d.count);
 
     const color = d3.scaleOrdinal()
-        .domain(data.map(d => d.country))
+        .domain(data.map(d => d.topic))
         .range(d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length).reverse());
 
     const svg = d3.select(element)
@@ -26,10 +26,10 @@ async function visualizeDonutChart(data, element){
         .selectAll()
         .data(pie(data))
         .join("path")
-        .attr("fill", d => color(d.data.country))
+        .attr("fill", d => color(d.data.topic))
         .attr("d", arc)
         .append("title")
-        .text(d => `${d.data.country}: ${d.data.count.toLocaleString()}`);
+        .text(d => `${d.data.topic}: ${d.data.count.toLocaleString()}`);
 
     svg.append("g")
         .attr("font-family", "sans-serif")
@@ -42,7 +42,7 @@ async function visualizeDonutChart(data, element){
         .call(text => text.append("tspan")
             .attr("y", "-0.4em")
             .attr("font-weight", "bold")
-            .text(d => d.data.country))
+            .text(d => d.data.topic))
         .call(text => text.filter(d => (d.endAngle - d.startAngle) > 0.25).append("tspan")
             .attr("x", 0)
             .attr("y", "0.7em")

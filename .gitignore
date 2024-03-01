@@ -31,3 +31,6 @@ __pycache__/
 
 # Virtual environment
 venv/
+
+data_visualization/static/js/dev
+guide.txt
