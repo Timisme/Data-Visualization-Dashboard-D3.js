@@ -38,22 +38,22 @@
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-light sticky-top" style="background-color: #e3f2fd;">
-        <a class="navbar-brand" href="#">Navbar</a>
+        <a class="navbar-brand" href="#">Dashboard</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link active" href="/">Dashboard <span class="sr-only">(current)</span></a>
-                <a class="nav-item nav-link" href="/map">Map</a>
-                <a class="nav-item nav-link" href="/distribution">Topic & Sector distribution</a>
-                <a class="nav-item nav-link" href="/bar">Relevance, Intensity, or Likelihood across different Countrie or Regions</a>
-                <a class="nav-item nav-link" href="/line">Intensity and Likelihood over time</a>
+                <!-- <a class="nav-item nav-link active" href="/">Dashboard <span class="sr-only">(current)</span></a> -->
+                <a class="nav-item nav-link active" href="/map" id="map-nav-item">Map</a>
+                <a class="nav-item nav-link" href="/distribution" id="pie-nav-item">Topic & Sector distribution</a>
+                <a class="nav-item nav-link" href="/bar" id="bar-nav-item">Relevance, Intensity, or Likelihood across different Countrie or Regions</a>
+                <a class="nav-item nav-link" href="/line" id="line-nav-item">Intensity and Likelihood over time</a>
             </div>
         </div>
     </nav>
     <!-- Dropdown filter for sector -->
-    <div style="display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;">
+    <div style="display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 20px;">
         {% for filter_name, filter_options in filter_config.items %}
             <div style="display: flex; flex-direction: column; width: auto;">
                 <label for="{{ filter_name }}-filter" class="control-label">{{ filter_name }}</label>
@@ -89,6 +89,28 @@
     <script>
         // Initialize Bootstrap Select
         $('.selectpicker').selectpicker();
+
+        // change navbar focus
+        $(document).ready(function() {
+            // Get the current URL
+            const currentUrl = window.location.href;
+
+            // Check if the URL contains a specific string and add the 'active' class accordingly
+            const navItems = document.querySelectorAll(".nav-item");
+            navItems.forEach(item => {
+                item.classList.remove("active");
+            })
+
+            if (currentUrl.indexOf("map") !== -1) {
+                $("#map-nav-item").addClass("active");
+            } else if (currentUrl.indexOf("distribution") !== -1) {
+                $("#pie-nav-item").addClass("active");
+            } else if (currentUrl.indexOf("bar") !== -1) {
+                $("#bar-nav-item").addClass("active");
+            } else if (currentUrl.indexOf("line") !== -1) {
+                $("#line-nav-item").addClass("active");
+            }
+        });
     </script>
 </body>
 </html>

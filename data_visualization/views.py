@@ -201,7 +201,7 @@ def distribution(request):
     })
 
 def bar(request):
-    filter_config = _get_filter_config()
+    filter_config = _get_filter_config(exclude_fields=["start_year", "end_year"])
     return render(request, "bar.html", context={
         "filter_config": filter_config
     })
