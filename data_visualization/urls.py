@@ -11,4 +11,6 @@ urlpatterns = [
     path('api/data/chart2/',  views.Chart2DataView.as_view(), name='Chart2DataView'),
     path('api/data/chart3/',  views.Chart3DataView.as_view(), name='Chart3DataView'),
     path('api/data/chart4/',  views.Chart4DataView.as_view(), name='Chart4DataView'),
+    path('api/data/chart5/',  views.MapDataView.as_view(), name='Chart5DataView'),
+
 ]

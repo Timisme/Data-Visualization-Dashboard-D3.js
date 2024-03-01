@@ -1,5 +1,6 @@
 # Create your models here.
 from django.db import models
+from .utils import COUNTRY_CODE_MAPPER
 
 class DataPoint(models.Model):
     end_year = models.IntegerField(null=True)
@@ -19,3 +20,9 @@ class DataPoint(models.Model):
     source = models.CharField(max_length=128, null=True)
     title = models.TextField(null=True)
     likelihood = models.IntegerField(null=True)
+
+    @property
+    def country_code(self):
+        if self.country:
+            return COUNTRY_CODE_MAPPER[self.country]
+        return None
