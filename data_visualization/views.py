@@ -136,7 +136,9 @@ class LineChartDataView(APIView):
             for date in date_data
         ]
 
-        return Response(data)
+        sorted_data = sorted(data, key=lambda x: x["date"])
+
+        return Response(sorted_data)
 
 def _get_filter_config(exclude_fields=[]) -> dict:
     filter_fields = [field for field in DataPointFilter.Meta.fields if field not in exclude_fields]

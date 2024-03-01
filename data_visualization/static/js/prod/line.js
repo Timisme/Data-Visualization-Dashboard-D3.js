@@ -1,132 +1,125 @@
 async function visualizeLineChart(_data, element){
-    // set the dimensions and margins of the graph
-    const margin = {top: 10, right: 30, bottom: 30, left: 60},
-        width = 460 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom;
+    // Declare the chart dimensions and margins.
+    const width = 600;
+    const height = 500;
+    const marginTop = 20;
+    const marginRight = 30;
+    const marginBottom = 30;
+    const marginLeft = 40;
 
-    // append the svg object to the body of the page
+    // change string into date object
+    const data = _data.map(item => {
+        item["date"] = new Date(item["date"])
+        return item
+    })
+
+    // Declare the x (horizontal position) scale.
+    const x = d3.scaleUtc(d3.extent(data, d => d.date), [marginLeft, width - marginRight]);
+
+    // Declare the y (vertical position) scale.
+    const y = d3.scaleLinear([
+            d3.min(data, d => d.average_intensity),
+            d3.max(data, d => d.average_intensity)
+        ],
+        [height - marginBottom, marginTop]
+    );
+
+    // Declare the line generator.
+    const line = d3.line()
+        .x(d => x(d.date))
+        .y(d => y(d.average_intensity));
+
+    // Create the SVG container.
     const svg = d3.select(element)
-    // .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-        .attr("transform",
-            `translate(${margin.left}, ${margin.top})`);
+        .attr("viewBox", [0, 0, width, height])
+        .attr("width", width)
+        .attr("height", height)
+        .attr("style", "max-width: 100%; height: auto; height: intrinsic; font: 10px sans-serif;")
+        .style("-webkit-tap-highlight-color", "transparent")
+        .style("overflow", "visible")
+        .on("pointerenter pointermove", pointermoved)
+        .on("pointerleave", pointerleft)
+        .on("touchstart", event => event.preventDefault());
 
-    //Read the data
-    d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/3_TwoNumOrdered_comma.csv",
+    // Add the x-axis.
+    svg.append("g")
+        .attr("transform", `translate(0,${height - marginBottom})`)
+        .call(d3.axisBottom(x).ticks(width / 80).tickSizeOuter(0));
 
-    // When reading the csv, I must format variables:
-    function(d){
-        return { date : d3.timeParse("%Y-%m-%d")(d.date), value : d.value }
-    }).then(
+    // Add the y-axis, remove the domain line, add grid lines and a label.
+    svg.append("g")
+        .attr("transform", `translate(${marginLeft},0)`)
+        .call(d3.axisLeft(y).ticks(height / 40))
+        .call(g => g.select(".domain").remove())
+        .call(g => g.selectAll(".tick line").clone()
+            .attr("x2", width - marginLeft - marginRight)
+            .attr("stroke-opacity", 0.1))
+        .call(g => g.append("text")
+            .attr("x", -marginLeft)
+            .attr("y", 10)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "start")
+            .text("↑ Average Intensity"));
 
-    // Now I can use this dataset:
-    function(data) {
-
-        data = _data.map(item => {
-            item["date"] = d3.timeParse("%Y-%m-%d")(item.date)
-            item["value"] = item["average_intensity"]
-            return item
-        })
-
-        console.log("_data", _data)
-        console.log("data", data)
-
-        // Add X axis --> it is a date format
-        const x = d3.scaleTime()
-        .domain(d3.extent(data, function(d) { return d.date; }))
-        .range([ 0, width ]);
-        xAxis = svg.append("g")
-        .attr("transform", `translate(0, ${height})`)
-        .call(d3.axisBottom(x));
-
-        // Add Y axis
-        const y = d3.scaleLinear()
-        .domain([0, d3.max(data, function(d) { return +d.value; })])
-        .range([ height, 0 ]);
-        yAxis = svg.append("g")
-        .call(d3.axisLeft(y));
-
-        // Add a clipPath: everything out of this area won't be drawn.
-        const clip = svg.append("defs").append("svg:clipPath")
-            .attr("id", "clip")
-            .append("svg:rect")
-            .attr("width", width )
-            .attr("height", height )
-            .attr("x", 0)
-            .attr("y", 0);
-
-        // Add brushing
-        const brush = d3.brushX()                   // Add the brush feature using the d3.brush function
-            .extent( [ [0,0], [width,height] ] )  // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
-            .on("end", updateChart)               // Each time the brush selection changes, trigger the 'updateChart' function
-
-        // Create the line variable: where both the line and the brush take place
-        const line = svg.append('g')
-        .attr("clip-path", "url(#clip)")
-
-        // Add the line
-        line.append("path")
-        .datum(data)
-        .attr("class", "line")  // I add the class line to be able to modify this line later on.
+    // Append a path for the line.
+    svg.append("path")
         .attr("fill", "none")
         .attr("stroke", "steelblue")
         .attr("stroke-width", 1.5)
-        .attr("d", d3.line()
-            .x(function(d) { return x(d.date) })
-            .y(function(d) { return y(d.value) })
-            )
+        .attr("d", line(data));
 
-        // Add the brushing
-        line
-        .append("g")
-            .attr("class", "brush")
-            .call(brush);
+    // Create the tooltip container.
+    const tooltip = svg.append("g");
 
-        // A function that set idleTimeOut to null
-        let idleTimeout
-        function idled() { idleTimeout = null; }
+    function formatValue(value) {
+        return value.toFixed(2);
+    }
 
-        // A function that update the chart for given boundaries
-        function updateChart(event,d) {
+    function formatDate(date) {
+      return date.toLocaleString("en", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        timeZone: "UTC"
+      });
+    }
 
-        // What are the selected boundaries?
-        extent = event.selection
+    // Add the event listeners that show or hide the tooltip.
+    const bisect = d3.bisector(d => d.date).center;
+    function pointermoved(event) {
+      const i = bisect(data, x.invert(d3.pointer(event)[0]));
+      tooltip.style("display", null);
+      tooltip.attr("transform", `translate(${x(data[i].date)},${y(data[i].average_intensity)})`);
 
-        // If no selection, back to initial coordinate. Otherwise, update X axis domain
-        if(!extent){
-            if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
-            x.domain([ 4,8])
-        }else{
-            x.domain([ x.invert(extent[0]), x.invert(extent[1]) ])
-            line.select(".brush").call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
-        }
+      const path = tooltip.selectAll("path")
+        .data([,])
+        .join("path")
+          .attr("fill", "white")
+          .attr("stroke", "black");
 
-        // Update axis and line position
-        xAxis.transition().duration(1000).call(d3.axisBottom(x))
-        line
-            .select('.line')
-            .transition()
-            .duration(1000)
-            .attr("d", d3.line()
-                .x(function(d) { return x(d.date) })
-                .y(function(d) { return y(d.value) })
-            )
-        }
+      const text = tooltip.selectAll("text")
+        .data([,])
+        .join("text")
+        .call(text => text
+          .selectAll("tspan")
+          .data([formatDate(data[i].date), formatValue(data[i].average_intensity)])
+          .join("tspan")
+            .attr("x", 0)
+            .attr("y", (_, i) => `${i * 1.1}em`)
+            .attr("font-weight", (_, i) => i ? null : "bold")
+            .text(d => d));
 
-        // If user double click, reinitialize the chart
-        svg.on("dblclick",function(){
-        x.domain(d3.extent(data, function(d) { return d.date; }))
-        xAxis.transition().call(d3.axisBottom(x))
-        line
-            .select('.line')
-            .transition()
-            .attr("d", d3.line()
-            .x(function(d) { return x(d.date) })
-            .y(function(d) { return y(d.value) })
-        )
-        });
+      size(text, path);
+    }
 
-    })
+    function pointerleft() {
+      tooltip.style("display", "none");
+    }
+
+    // Wraps the text with a callout path of the correct size, as measured in the page.
+    function size(text, path) {
+      const {x, y, width: w, height: h} = text.node().getBBox();
+      text.attr("transform", `translate(${-w / 2},${15 - y})`);
+      path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`);
+    }
 }
