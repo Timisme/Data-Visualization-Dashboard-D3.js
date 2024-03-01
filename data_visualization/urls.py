@@ -12,10 +12,15 @@ urlpatterns = [
     path('data-points/', views.DataPointList.as_view(), name='data-point-list'),
     path('api/data/', views.DataPointList.as_view(), name='data-list'),
     path('api/data/chart1/',  views.TopicDonutDataView.as_view(), name='TopicDonutDataView'),
-    path('api/data/chart2/',  views.Chart2DataView.as_view(), name='Chart2DataView'),
+    path('api/data/chart2/',  views.RegionIntensityBarView.as_view(), name='RegionIntensityBarView'),
     path('api/data/chart3/',  views.Chart3DataView.as_view(), name='Chart3DataView'),
     path('api/data/chart4/',  views.Chart4DataView.as_view(), name='Chart4DataView'),
     path('api/data/chart5/',  views.MapDataView.as_view(), name='Chart5DataView'),
-    path('api/data/chart6/',  views.LineChartDataView.as_view(), name='Chart6DataView'),
-
+    path('api/data/chart6/',  views.LineChartIntensityDataView.as_view(), name='Chart6DataView'),
+    path('api/data/chart7/',  views.LineChartLikelihoodDataView.as_view(), name='Chart7DataView'),
+    path('api/data/chart8/',  views.RegionLikelihoodBarView.as_view(), name='Chart8DataView'),
+    path('api/data/chart9/',  views.RegionRelevanceBarView.as_view(), name='Chart9DataView'),
+    path('api/data/chart10/',  views.CountryIntensityBarView.as_view(), name='Chart10DataView'),
+    path('api/data/chart11/',  views.CountryLikelihoodBarView.as_view(), name='Chart11DataView'),
+    path('api/data/chart12/',  views.CountryRelevanceBarView.as_view(), name='Chart12DataView'),
 ]

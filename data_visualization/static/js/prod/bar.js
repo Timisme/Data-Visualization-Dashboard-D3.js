@@ -1,25 +1,25 @@
 async function visualizeBarChart(data, element){
     // Declare the chart dimensions and margins.
-    const width = 600;
-    const height = 500;
+    const width = 500;
+    const height = 400;
     const marginTop = 30;
     const marginRight = 0;
     const marginBottom = 30;
     const marginLeft = 40;
 
     // const data = [
-    //     {sector: "a", count: 200}
+    //     {category: "a", value: 200}
     // ]
-
+    console.log("data:", data);
     // Declare the x (horizontal position) scale.
     const x = d3.scaleBand()
-        .domain(d3.groupSort(data, ([d]) => -d.count, (d) => d.sector)) // descending count
+        .domain(d3.groupSort(data, ([d]) => -d.value, (d) => d.category)) // descending value
         .range([marginLeft, width - marginRight])
         .padding(0.1);
 
     // Declare the y (vertical position) scale.
     const y = d3.scaleLinear()
-        .domain([0, d3.max(data, (d) => d.count)])
+        .domain([0, d3.max(data, (d) => d.value)]).nice()
         .range([height - marginBottom, marginTop]);
 
     // Create the SVG container.
@@ -35,9 +35,9 @@ async function visualizeBarChart(data, element){
       .selectAll()
       .data(data)
       .join("rect")
-        .attr("x", (d) => x(d.sector))
-        .attr("y", (d) => y(d.count))
-        .attr("height", (d) => y(0) - y(d.count))
+        .attr("x", (d) => x(d.category))
+        .attr("y", (d) => y(d.value))
+        .attr("height", (d) => y(0) - y(d.value))
         .attr("width", x.bandwidth());
 
     // Add the x-axis and label.
@@ -48,12 +48,12 @@ async function visualizeBarChart(data, element){
     // Add the y-axis and label, and remove the domain line.
     svg.append("g")
         .attr("transform", `translate(${marginLeft},0)`)
-        .call(d3.axisLeft(y).tickFormat((y) => (y * 100).toFixed()))
+        .call(d3.axisLeft(y).tickFormat((y) => y.toFixed()))
         .call(g => g.select(".domain").remove())
         .call(g => g.append("text")
             .attr("x", -marginLeft)
             .attr("y", 10)
             .attr("fill", "currentColor")
             .attr("text-anchor", "start")
-            .text("count"));
+            .text("value"));
 }

@@ -1,7 +1,7 @@
 async function visualizeLineChart(_data, element){
     // Declare the chart dimensions and margins.
-    const width = 600;
-    const height = 500;
+    const width = 500;
+    const height = 400;
     const marginTop = 20;
     const marginRight = 30;
     const marginBottom = 30;
@@ -18,8 +18,8 @@ async function visualizeLineChart(_data, element){
 
     // Declare the y (vertical position) scale.
     const y = d3.scaleLinear([
-            d3.min(data, d => d.average_intensity),
-            d3.max(data, d => d.average_intensity)
+            d3.min(data, d => d.value),
+            d3.max(data, d => d.value)
         ],
         [height - marginBottom, marginTop]
     );
@@ -27,7 +27,7 @@ async function visualizeLineChart(_data, element){
     // Declare the line generator.
     const line = d3.line()
         .x(d => x(d.date))
-        .y(d => y(d.average_intensity));
+        .y(d => y(d.value));
 
     // Create the SVG container.
     const svg = d3.select(element)
@@ -59,7 +59,7 @@ async function visualizeLineChart(_data, element){
             .attr("y", 10)
             .attr("fill", "currentColor")
             .attr("text-anchor", "start")
-            .text("↑ Average Intensity"));
+            .text("↑ Average Value"));
 
     // Append a path for the line.
     svg.append("path")
@@ -89,7 +89,7 @@ async function visualizeLineChart(_data, element){
     function pointermoved(event) {
       const i = bisect(data, x.invert(d3.pointer(event)[0]));
       tooltip.style("display", null);
-      tooltip.attr("transform", `translate(${x(data[i].date)},${y(data[i].average_intensity)})`);
+      tooltip.attr("transform", `translate(${x(data[i].date)},${y(data[i].value)})`);
 
       const path = tooltip.selectAll("path")
         .data([,])
@@ -102,7 +102,7 @@ async function visualizeLineChart(_data, element){
         .join("text")
         .call(text => text
           .selectAll("tspan")
-          .data([formatDate(data[i].date), formatValue(data[i].average_intensity)])
+          .data([formatDate(data[i].date), formatValue(data[i].value)])
           .join("tspan")
             .attr("x", 0)
             .attr("y", (_, i) => `${i * 1.1}em`)

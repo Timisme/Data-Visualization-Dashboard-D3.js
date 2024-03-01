@@ -16,7 +16,7 @@ async function visualizeGroupedBarChart(data, element){
     // Prepare the scales for positional and color encodings.
     // Fx encodes the country.
     const fx = d3.scaleBand()
-        .domain(new Set(data.map(d => d.country)))
+        .domain(new Set(data.map(d => d.region)))
         .rangeRound([marginLeft, width - marginRight])
         .paddingInner(0.1);
 
@@ -50,12 +50,12 @@ async function visualizeGroupedBarChart(data, element){
         .attr("viewBox", [0, 0, width, height])
         .attr("style", "max-width: 100%; height: auto;");
 
-    // Append a group for each country, and a rect for each category.
+    // Append a group for each region, and a rect for each category.
     svg.append("g")
       .selectAll()
-      .data(d3.group(data, d => d.country))
+      .data(d3.group(data, d => d.region))
       .join("g")
-        .attr("transform", ([country]) => `translate(${fx(country)},0)`)
+        .attr("transform", ([region]) => `translate(${fx(region)},0)`)
       .selectAll()
       .data(([, d]) => d)
       .join("rect")
@@ -78,7 +78,4 @@ async function visualizeGroupedBarChart(data, element){
         .call(g => g.selectAll(".domain").remove());
 
     //Legend
-
-    // Return the chart with the color scale as a property (for the legend).
-    return Object.assign(svg.node(), {scales: {color}});
-  }
+}
