@@ -2,8 +2,9 @@ const CHARTS_CONFIG = [
     {chartName: "1", endPoint: "/api/data/chart1/", func: visualizeDonutChart, elementName: "#chart1"},
     {chartName: "2", endPoint: "/api/data/chart2/", func: visualizeBarChart, elementName: "#chart2"},
     {chartName: "3", endPoint: "/api/data/chart3/", func: visualizePieChart, elementName: "#chart3"},
-    {chartName: "4", endPoint: "/api/data/chart4/", func: visualizeGroupedBarChart, elementName: "#chart4"},
-    {chartName: "5", endPoint: "/api/data/chart5/", func: visualizeMapChart, elementName: "#chart5"}
+    // {chartName: "4", endPoint: "/api/data/chart4/", func: visualizeGroupedBarChart, elementName: "#chart4"},
+    {chartName: "5", endPoint: "/api/data/chart5/", func: visualizeMapChart, elementName: "#chart5"},
+    {chartName: "6", endPoint: "/api/data/chart6/", func: visualizeLineChart, elementName: "#chart6"}
 ]
 
 async function fetchDataAndRenderChart(url, func, elementName) {
@@ -49,7 +50,7 @@ function serializeFilters(selectedValues){
         .join('&');
 }
 
-const filters = document.querySelectorAll("select");
+const filters = document.querySelectorAll(".filter");
 
 filters.forEach(filter => {
     filter.addEventListener("change", async function(event){

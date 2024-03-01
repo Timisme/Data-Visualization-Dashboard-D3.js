@@ -1,125 +1,132 @@
-async function visualizeLineChart(data, element){
-    // Specify the chart’s dimensions.
-    const width = 928;
-    const height = 600;
-    const marginTop = 20;
-    const marginRight = 20;
-    const marginBottom = 30;
-    const marginLeft = 30;
+async function visualizeLineChart(_data, element){
+    // set the dimensions and margins of the graph
+    const margin = {top: 10, right: 30, bottom: 30, left: 60},
+        width = 460 - margin.left - margin.right,
+        height = 400 - margin.top - margin.bottom;
 
-    const unemployment = [
-        {division: "Bethesda-Rockville-Frederick, MD Met Div", date: "2000-01-01", unemployment: 2.6},
-        {division: "Bethesda-Rockville-Frederick, MD Met Div", date: "2000-02-01", unemployment: 2.6},
-        {division: "Bethesda-Rockville-Frederick, MD Met Div", date: "2000-03-01", unemployment: 2.6}
-    ]
-
-    // Create the positional scales.
-    const x = d3.scaleUtc()
-      .domain(d3.extent(unemployment, d => d.date))
-      .range([marginLeft, width - marginRight]);
-
-    const y = d3.scaleLinear()
-      .domain([0, d3.max(unemployment, d => d.unemployment)]).nice()
-      .range([height - marginBottom, marginTop]);
-
-    // Create the SVG container.
+    // append the svg object to the body of the page
     const svg = d3.select(element)
-        .attr("width", width)
-        .attr("height", height)
-        .attr("viewBox", [0, 0, width, height])
-        .attr("style", "max-width: 100%; height: auto; overflow: visible; font: 10px sans-serif;");
+    // .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+        .attr("transform",
+            `translate(${margin.left}, ${margin.top})`);
 
-    // Add the horizontal axis.
-    svg.append("g")
-        .attr("transform", `translate(0,${height - marginBottom})`)
-        .call(d3.axisBottom(x).ticks(width / 80).tickSizeOuter(0));
+    //Read the data
+    d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/3_TwoNumOrdered_comma.csv",
 
-    // Add the vertical axis.
-    svg.append("g")
-        .attr("transform", `translate(${marginLeft}, 0)`)
-        .call(d3.axisLeft(y))
-        .call(g => g.select(".domain").remove())
-        .call(voronoi ? () => {} : g => g.selectAll(".tick line").clone()
-            .attr("x2", width - marginLeft - marginRight)
-            .attr("stroke-opacity", 0.1))
-        .call(g => g.append("text")
-            .attr("x", -marginLeft)
-            .attr("y", 10)
-            .attr("fill", "currentColor")
-            .attr("text-anchor", "start")
-            .text("↑ Unemployment (%)"));
+    // When reading the csv, I must format variables:
+    function(d){
+        return { date : d3.timeParse("%Y-%m-%d")(d.date), value : d.value }
+    }).then(
 
+    // Now I can use this dataset:
+    function(data) {
 
-    // Compute the points in pixel space as [x, y, z], where z is the name of the series.
-    const points = unemployment.map((d) => [x(d.date), y(d.unemployment), d.division]);
+        data = _data.map(item => {
+            item["date"] = d3.timeParse("%Y-%m-%d")(item.date)
+            item["value"] = item["average_intensity"]
+            return item
+        })
 
-    // An optional Voronoi display (for fun).
-    // if (voronoi) svg.append("path")
-    //     .attr("fill", "none")
-    //     .attr("stroke", "#ccc")
-    //     .attr("d", d3.Delaunay
-    //       .from(points)
-    //       .voronoi([0, 0, width, height])
-    //       .render());
+        console.log("_data", _data)
+        console.log("data", data)
 
-    // Group the points by series.
-    const groups = d3.rollup(points, v => Object.assign(v, {z: v[0][2]}), d => d[2]);
+        // Add X axis --> it is a date format
+        const x = d3.scaleTime()
+        .domain(d3.extent(data, function(d) { return d.date; }))
+        .range([ 0, width ]);
+        xAxis = svg.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(x));
 
-    // Draw the lines.
-    const line = d3.line();
-    const path = svg.append("g")
+        // Add Y axis
+        const y = d3.scaleLinear()
+        .domain([0, d3.max(data, function(d) { return +d.value; })])
+        .range([ height, 0 ]);
+        yAxis = svg.append("g")
+        .call(d3.axisLeft(y));
+
+        // Add a clipPath: everything out of this area won't be drawn.
+        const clip = svg.append("defs").append("svg:clipPath")
+            .attr("id", "clip")
+            .append("svg:rect")
+            .attr("width", width )
+            .attr("height", height )
+            .attr("x", 0)
+            .attr("y", 0);
+
+        // Add brushing
+        const brush = d3.brushX()                   // Add the brush feature using the d3.brush function
+            .extent( [ [0,0], [width,height] ] )  // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+            .on("end", updateChart)               // Each time the brush selection changes, trigger the 'updateChart' function
+
+        // Create the line variable: where both the line and the brush take place
+        const line = svg.append('g')
+        .attr("clip-path", "url(#clip)")
+
+        // Add the line
+        line.append("path")
+        .datum(data)
+        .attr("class", "line")  // I add the class line to be able to modify this line later on.
         .attr("fill", "none")
         .attr("stroke", "steelblue")
         .attr("stroke-width", 1.5)
-        .attr("stroke-linejoin", "round")
-        .attr("stroke-linecap", "round")
-      .selectAll("path")
-      .data(groups.values())
-      .join("path")
-        .style("mix-blend-mode", "multiply")
-        .attr("d", line);
+        .attr("d", d3.line()
+            .x(function(d) { return x(d.date) })
+            .y(function(d) { return y(d.value) })
+            )
 
-    // Add an invisible layer for the interactive tip.
-    const dot = svg.append("g")
-        .attr("display", "none");
+        // Add the brushing
+        line
+        .append("g")
+            .attr("class", "brush")
+            .call(brush);
 
-    dot.append("circle")
-        .attr("r", 2.5);
+        // A function that set idleTimeOut to null
+        let idleTimeout
+        function idled() { idleTimeout = null; }
 
-    dot.append("text")
-        .attr("text-anchor", "middle")
-        .attr("y", -8);
+        // A function that update the chart for given boundaries
+        function updateChart(event,d) {
 
-    svg
-        .on("pointerenter", pointerentered)
-        .on("pointermove", pointermoved)
-        .on("pointerleave", pointerleft)
-        .on("touchstart", event => event.preventDefault());
+        // What are the selected boundaries?
+        extent = event.selection
 
-    return svg.node();
+        // If no selection, back to initial coordinate. Otherwise, update X axis domain
+        if(!extent){
+            if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
+            x.domain([ 4,8])
+        }else{
+            x.domain([ x.invert(extent[0]), x.invert(extent[1]) ])
+            line.select(".brush").call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
+        }
 
-    // When the pointer moves, find the closest point, update the interactive tip, and highlight
-    // the corresponding line. Note: we don't actually use Voronoi here, since an exhaustive search
-    // is fast enough.
-    function pointermoved(event) {
-      const [xm, ym] = d3.pointer(event);
-      const i = d3.leastIndex(points, ([x, y]) => Math.hypot(x - xm, y - ym));
-      const [x, y, k] = points[i];
-      path.style("stroke", ({z}) => z === k ? null : "#ddd").filter(({z}) => z === k).raise();
-      dot.attr("transform", `translate(${x},${y})`);
-      dot.select("text").text(k);
-      svg.property("value", unemployment[i]).dispatch("input", {bubbles: true});
-    }
+        // Update axis and line position
+        xAxis.transition().duration(1000).call(d3.axisBottom(x))
+        line
+            .select('.line')
+            .transition()
+            .duration(1000)
+            .attr("d", d3.line()
+                .x(function(d) { return x(d.date) })
+                .y(function(d) { return y(d.value) })
+            )
+        }
 
-    function pointerentered() {
-      path.style("mix-blend-mode", null).style("stroke", "#ddd");
-      dot.attr("display", null);
-    }
+        // If user double click, reinitialize the chart
+        svg.on("dblclick",function(){
+        x.domain(d3.extent(data, function(d) { return d.date; }))
+        xAxis.transition().call(d3.axisBottom(x))
+        line
+            .select('.line')
+            .transition()
+            .attr("d", d3.line()
+            .x(function(d) { return x(d.date) })
+            .y(function(d) { return y(d.value) })
+        )
+        });
 
-    function pointerleft() {
-      path.style("mix-blend-mode", "multiply").style("stroke", null);
-      dot.attr("display", "none");
-      svg.node().value = null;
-      svg.dispatch("input", {bubbles: true});
-    }
+    })
 }

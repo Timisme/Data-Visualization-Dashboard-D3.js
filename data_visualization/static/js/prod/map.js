@@ -43,6 +43,9 @@ async function visualizeMapChart(data, element){
             mapData.set(item.code, +item.count)
         })
 
+        console.log(mapData)
+        console.log(data)
+
         let tooltip = d3.select("body")
             .append("div")
             .attr("class", "tooltip")
