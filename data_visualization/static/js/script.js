@@ -13,11 +13,33 @@ const CHARTS_CONFIG = [
     {chartName: "12", endPoint: "/api/data/chart12/", func: visualizeBarChart, elementName: "#chart12"}
 ]
 
+async function showEmptyOnChart(elementName){
+    const svgWidth = 400;
+    const svgHeight = 300;
+
+    const svg = d3.select(elementName)
+        .attr("width", svgWidth)
+        .attr("height", svgHeight)
+
+    svg.append("text")
+        .attr("x", svgWidth / 2)
+        .attr("y", svgHeight / 2)
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "middle")
+        .attr("font-size", 30)
+        .text("No Data Available");
+    return
+}
+
 async function fetchDataAndRenderChart(url, func, elementName) {
     const response = await fetch(url);
     const data = await response.json();
     // Now you have your data and can pass it to a D3.js function to visualize
-    await func(data, elementName);
+    if ($.isEmptyObject(data)){
+        await showEmptyOnChart(elementName);
+    } else {
+        await func(data, elementName);
+    }
 }
 
 async function renderAllCharts(urlParams){
@@ -35,7 +57,12 @@ renderAllCharts();
 
 // add filter callback
 async function cleanUpD3(){
-    d3.selectAll("svg").selectAll("*").remove();
+    d3.selectAll("svg")
+    .attr("width", null)
+    .attr("height", null)
+    .attr("viewBox", null)
+    .attr("style", null)
+    .selectAll("*").remove();
     return
 }
 

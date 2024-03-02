@@ -57,6 +57,10 @@ class Command(BaseCommand):
 
                         kwargs[field_name] = value
 
+                        # change 'world' to 'World'
+                        if field_name == "region" and value == "world":
+                            kwargs[field_name] = "World"
+
                     if kwargs:
                         instances.append(DataPoint(**kwargs))
 

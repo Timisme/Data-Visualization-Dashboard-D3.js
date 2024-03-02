@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from django.db.models import Count, Avg
 from django.shortcuts import render
+from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -11,7 +12,7 @@ from .filters import DataPointFilter
 from .utils import COUNTRY_CODE_MAPPER, generate_month_dates
 
 
-# Create your views here.
+# Rest API views
 
 class DataPointList(APIView):
     def get(self, request, format=None):
@@ -185,12 +186,38 @@ class LineChartLikelihoodDataView(APIView):
         sorted_data = _get_sorted_line_data(filter.qs, "likelihood")
         return Response(sorted_data)
 
-def _get_filter_config(exclude_fields=[]) -> dict:
+def _get_filter_config(exclude_fields=[], not_null_fields=[]) -> dict:
     filter_fields = [field for field in DataPointFilter.Meta.fields if field not in exclude_fields]
     filter_config = {}
     for field_name in filter_fields:
-        filter_config[field_name] = list(DataPoint.objects.values_list(field_name, flat=True).distinct())
+
+        exclude_kwargs = {field_name: None}
+
+        if not_null_fields:
+            q_objects = [Q(**{f"{field}__isnull": False}) for field in not_null_fields]
+            combined_q_objects = Q()
+            for q_object in q_objects:
+                combined_q_objects &= q_object
+
+            print(combined_q_objects)
+
+            options = list(
+                DataPoint.objects
+                    .exclude(**exclude_kwargs)
+                    .filter(combined_q_objects)
+                    .values_list(field_name, flat=True)
+                    .distinct()
+                )
+        else:
+            options = list(DataPoint.objects.exclude(**exclude_kwargs).values_list(field_name, flat=True).distinct())
+
+        options.sort()
+        filter_config[field_name] = options
+
     return filter_config
+
+
+# template rendering views
 
 def dashboard(request):
     return render(request, "dashboard.html", context={
@@ -209,27 +236,19 @@ def distribution(request):
     })
 
 def bar(request):
-    filter_config = _get_filter_config(exclude_fields=["start_year", "end_year"])
+    filter_config = _get_filter_config(
+        exclude_fields=["start_year", "end_year"],
+        not_null_fields=["intensity", "likelihood", "relevance"]
+    )
     return render(request, "bar.html", context={
         "filter_config": filter_config
     })
 
 def line(request):
-    filter_config = _get_filter_config(["start_year", "end_year"])
+    filter_config = _get_filter_config(
+        exclude_fields=["start_year", "end_year"],
+        not_null_fields=["intensity", "likelihood", "start_year", "end_year"]
+    )
     return render(request, "line.html", context={
         "filter_config": filter_config
     })
-
-'''not used'''
-def get(self, request, format=None):
-    queryset = DataPoint.objects.all()
-
-    # Example for filtering by year
-    year = request.query_params.get('year')
-    if year is not None:
-        queryset = queryset.filter(year=year)
-
-    # Implement other filters similarly
-
-    serializer = DataPointSerializer(queryset, many=True)
-    return Response(serializer.data)
