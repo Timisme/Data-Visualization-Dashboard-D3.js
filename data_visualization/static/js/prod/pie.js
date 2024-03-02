@@ -6,7 +6,8 @@ async function visualizePieChart(data, element){
     // Create the color scale.
     const color = d3.scaleOrdinal()
         .domain(data.map(d => d.sector))
-        .range(d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length).reverse())
+        .range(data.length === 1 ? ["rgb(131, 204, 165)"] :
+            d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length).reverse())
 
     // Create the pie layout and arc generator.
     const pie = d3.pie()

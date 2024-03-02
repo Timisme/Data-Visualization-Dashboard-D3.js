@@ -25,20 +25,13 @@ class TopicDonutDataView(APIView):
         filter = DataPointFilter(request.GET, queryset=queryset)
         queryset = filter.qs.values('topic').annotate(count=Count('id'))
 
-        COUNT_THRESHOLD = 0
-        others_data = {"topic": "others", "count": 0}
-        result = []
+        COUNT_THRESHOLD = 5
 
-        for data in list(queryset):
-            if data["count"] <= COUNT_THRESHOLD:
-                others_data["count"] += data["count"]
-            else:
-                result.append(data)
+        sorted_data = sorted(list(queryset), key=lambda x: x["count"], reverse=True)
+        if len(sorted_data) > COUNT_THRESHOLD:
+            return Response(sorted_data[:COUNT_THRESHOLD])
 
-        if others_data["count"] != 0:
-            result.append(others_data)
-
-        return Response(result)
+        return Response(sorted_data)
 
 class RegionIntensityBarView(APIView):
     category_field = "region"
@@ -77,12 +70,19 @@ class CountryRelevanceBarView(RegionIntensityBarView):
     category_field = "country"
     value_field = "relevance"
 
-class Chart3DataView(APIView):
+class SectorPieChartDataView(APIView):
     def get(self, request, format=None):
         queryset = DataPoint.objects.exclude(sector__isnull=True)
         filter = DataPointFilter(request.GET, queryset=queryset)
         queryset = filter.qs.values('sector').annotate(count=Count('id'))
-        return Response(list(queryset))
+
+        COUNT_THRESHOLD = 5
+
+        sorted_data = sorted(list(queryset), key=lambda x: x["count"], reverse=True)
+        if len(sorted_data) > COUNT_THRESHOLD:
+            return Response(sorted_data[:COUNT_THRESHOLD])
+
+        return Response(sorted_data)
 
 class Chart4DataView(APIView):
     def get(self, request, format=None):

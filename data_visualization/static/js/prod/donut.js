@@ -14,7 +14,8 @@ async function visualizeDonutChart(data, element){
 
     const color = d3.scaleOrdinal()
         .domain(data.map(d => d.topic))
-        .range(d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length).reverse());
+        .range(data.length === 1 ? ["rgb(131, 204, 165)"] :
+            d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length).reverse());
 
     const svg = d3.select(element)
         .attr("width", width)

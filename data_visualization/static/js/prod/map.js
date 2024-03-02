@@ -55,7 +55,7 @@ async function visualizeMapChart(data, element){
                 .style("opacity", 1);
 
             tooltip.html(
-                d.properties.name + "<br/>" + "Data Count: " + (mapData.get(d.id) || 0)
+                `<strong>${d.properties.name}</strong>` + "<br/>" + "Data Count: " + (mapData.get(d.id) || 0)
                 + "<br/>" + "Average Intensity: " + intensityMapper[d.id].toFixed(1)
                 + "<br/>" + "Average Likelihood: " + likelihoodMapper[d.id].toFixed(1)
                 + "<br/>" + "Average Relevance: " + relevanceMapper[d.id].toFixed(1)
