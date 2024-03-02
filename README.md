@@ -39,14 +39,14 @@ pip install -r requirements.txt
 
 4. **Run migrations**
 
-python manage.py makemigrations
-python manage.py migrate
+`python manage.py makemigrations`
+`python manage.py migrate`
 
 5. **Load the dataset**
 
 - Use the provided script to load the dataset into your database.
 
-python manage.py load_json_data jsdata.json (assume the jsdata.json is located in the same directory as manage.py)
+`python manage.py load_json_data jsdata.json` (assume the jsdata.json is located in the same directory as manage.py)
 
 6. **Run the development server**
 
