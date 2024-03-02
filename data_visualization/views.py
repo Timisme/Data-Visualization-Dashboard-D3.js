@@ -213,7 +213,8 @@ def _get_filter_config(exclude_fields=[], not_null_fields=[]) -> dict:
             options = list(DataPoint.objects.exclude(**exclude_kwargs).values_list(field_name, flat=True).distinct())
 
         options.sort()
-        filter_config[field_name] = options
+
+        filter_config[field_name.upper().replace("_", " ")] = options
 
     return filter_config
 
