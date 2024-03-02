@@ -27,6 +27,7 @@ async function showEmptyOnChart(elementName){
         .attr("text-anchor", "middle")
         .attr("alignment-baseline", "middle")
         .attr("font-size", 30)
+        .attr("fill", "red")
         .text("No Data Available");
     return
 }
