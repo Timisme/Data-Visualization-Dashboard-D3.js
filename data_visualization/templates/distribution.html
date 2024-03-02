@@ -1,6 +1,12 @@
 {% extends 'index.html' %}
 
 {% block charts %}
-    <svg id="chart1"></svg>
-    <svg id="chart3"></svg>
+    <div class="text-center border">
+        <h5 style="margin-bottom: 20px; padding-top: 10px;">Topics Distribution</h5>
+        <svg id="chart1" style="border-color: rgb(47, 128, 237);"></svg>
+    </div>
+    <div class="text-center border">
+        <h5 style="margin-bottom: 20px; padding-top: 10px;">Sectors Distribution</h5>
+        <svg id="chart3"></svg>
+    </div>
 {% endblock %}

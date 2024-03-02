@@ -1,7 +1,7 @@
 async function visualizePieChart(data, element){
     // Specify the chart’s dimensions.
-    const width = 600;
-    const height = Math.min(width, 500);
+    const width = 500;
+    const height = Math.min(width, 400);
 
     // Create the color scale.
     const color = d3.scaleOrdinal()

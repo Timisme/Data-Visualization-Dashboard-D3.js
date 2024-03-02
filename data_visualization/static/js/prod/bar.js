@@ -1,16 +1,12 @@
 async function visualizeBarChart(data, element){
     // Declare the chart dimensions and margins.
-    const width = 500;
-    const height = 400;
+    const width = 400;
+    const height = 300;
     const marginTop = 30;
     const marginRight = 0;
     const marginBottom = 30;
     const marginLeft = 40;
 
-    // const data = [
-    //     {category: "a", value: 200}
-    // ]
-    console.log("data:", data);
     // Declare the x (horizontal position) scale.
     const x = d3.scaleBand()
         .domain(d3.groupSort(data, ([d]) => -d.value, (d) => d.category)) // descending value
