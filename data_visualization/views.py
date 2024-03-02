@@ -85,6 +85,7 @@ class SectorPieChartDataView(APIView):
 
         return Response(sorted_data)
 
+# this is deprecated
 class Chart4DataView(APIView):
     def get(self, request, format=None):
         result = []

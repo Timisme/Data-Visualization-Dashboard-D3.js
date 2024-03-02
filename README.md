@@ -19,7 +19,6 @@ This project is a data visualization dashboard developed using Django, PostgreSQ
 - Django
 - PostgreSQL
 - D3.js
-- Node.js and npm (for D3.js and Bootstrap)
 
 ### Setup
 
@@ -47,7 +46,7 @@ python manage.py migrate
 
 - Use the provided script to load the dataset into your database.
 
-python manage.py loaddata jsdata.json
+python manage.py load_json_data jsdata.json (assume the jsdata.json is located in the same directory as manage.py)
 
 6. **Run the development server**
 

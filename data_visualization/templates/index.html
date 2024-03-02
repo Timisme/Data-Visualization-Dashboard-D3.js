@@ -68,7 +68,7 @@
     <div style="display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 20px;">
         {% for filter_name, filter_options in filter_config.items %}
             <div style="display: flex; flex-direction: column; width: auto;">
-                <label for="{{ filter_name }}-filter" class="control-label">{{ filter_name }}</label>
+                <label for="{{ filter_name }}-filter" class="text-center">{{ filter_name }}</label>
                 <select id="{{ filter_name }}-filter" name="{{ filter_name }}" class="filter selectpicker" data-width="auto">
                     {% for option_name in filter_options %}
                         <option value="{{ option_name }}" data-tokens="{{ option_name }}">{{ option_name }}</option>
@@ -87,15 +87,13 @@
     </div>
 
     <!-- Include D3.js library -->
-    <script src="{% static 'js/prod/donut.js' %}" defer></script>
-    <script src="{% static 'js/prod/bar.js' %}" defer></script>
-    <script src="{% static 'js/prod/line.js' %}" defer></script>
-    <script src="{% static 'js/prod/grouped_bar.js' %}" defer></script>
-    <script src="{% static 'js/prod/pie.js' %}" defer></script>
-    <script src="{% static 'js/prod/countries-50m.js' %}"></script>
-    <!-- <script src="{% static 'js/prod/map.js' %}" defer></script> -->
-    <script src="{% static 'js/prod/map.js' %}" defer></script>
-    <!-- <script src="{% static 'js/dev/histogram.js' %}" defer></script> -->
+    <script src="{% static 'js/charts/donut.js' %}" defer></script>
+    <script src="{% static 'js/charts/bar.js' %}" defer></script>
+    <script src="{% static 'js/charts/line.js' %}" defer></script>
+    <script src="{% static 'js/charts/grouped_bar.js' %}" defer></script>
+    <script src="{% static 'js/charts/pie.js' %}" defer></script>
+    <script src="{% static 'js/charts/countries-50m.js' %}"></script>
+    <script src="{% static 'js/charts/map.js' %}" defer></script>
     <script src="{% static 'js/script.js' %}" defer></script>
 
     <script>
