@@ -19,16 +19,13 @@ async function visualizeMapChart(data, element){
     // Data and color scale
     let mapData = new Map();
     const colorScale = d3.scaleThreshold()
-    .domain([0, 10, 50, 100])
-    .range(d3.schemeBlues[4]);
+    .domain([0, 5, 10, 20, 50, 100, 150])
+    .range(d3.schemeBlues[7]);
 
-    // Load external data and boot
-    // Promise.all([
-    // d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"),
-    // d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world_population.csv", function(d) {
-    //     mapData.set(d.code, +d.pop)
-    // })]).then(function(loadData){
-    //     topo = loadData[0];
+    // extra data for tooltip
+    let intensityMapper = {}
+    let likelihoodMapper = {}
+    let relevanceMapper = {}
 
     d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson")
     .then(function(topo) {
@@ -41,10 +38,10 @@ async function visualizeMapChart(data, element){
         // set data on the map by country code (3 digits)
         data.forEach(item => {
             mapData.set(item.code, +item.count)
+            intensityMapper[item.code] = item.avg_intensity
+            likelihoodMapper[item.code] = item.avg_likelihood
+            relevanceMapper[item.code] = item.avg_relevance
         })
-
-        console.log(mapData)
-        console.log(data)
 
         let tooltip = d3.select("body")
             .append("div")
@@ -52,11 +49,18 @@ async function visualizeMapChart(data, element){
             .style("opacity", 0);
 
         let mouseOver = function(event, d) {
+            console.log("d: ", d)
             tooltip.transition()
-                .duration(10)
-                .style("opacity", .9);
-            tooltip.html(d.properties.name + "<br/>" + "Count: " + (mapData.get(d.id) || 0))
-                .style("left", (event.pageX) + "px")
+                .duration(200)
+                .style("opacity", 1);
+
+            tooltip.html(
+                d.properties.name + "<br/>" + "Data Count: " + (mapData.get(d.id) || 0)
+                + "<br/>" + "Average Intensity: " + intensityMapper[d.id].toFixed(1)
+                + "<br/>" + "Average Likelihood: " + likelihoodMapper[d.id].toFixed(1)
+                + "<br/>" + "Average Relevance: " + relevanceMapper[d.id].toFixed(1)
+            )
+                .style("left", (event.pageX + 20) + "px")
                 .style("top", (event.pageY - 28) + "px");
 
             d3.selectAll(".Country")
@@ -73,7 +77,7 @@ async function visualizeMapChart(data, element){
 
         let mouseLeave = function(d) {
             tooltip.transition()
-                .duration(10)
+                .duration(500)
                 .style("opacity", 0);
             d3.selectAll(".Country")
                 .transition()
@@ -103,7 +107,7 @@ async function visualizeMapChart(data, element){
             .style("stroke", "transparent")
             .attr("class", function(d){ return "Country" } )
             .style("opacity", .8)
-            .on("mouseover", mouseOver )
-            .on("mouseleave", mouseLeave )
+            .on("mouseover", mouseOver)
+            .on("mouseleave", mouseLeave)
         })
 }

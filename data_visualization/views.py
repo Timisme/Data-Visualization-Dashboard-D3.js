@@ -101,7 +101,12 @@ class MapDataView(APIView):
     def get(self, request, format=None):
         queryset = DataPoint.objects.exclude(country__isnull=True)
         filter = DataPointFilter(request.GET, queryset=queryset)
-        queryset = filter.qs.values('country').annotate(count=Count("id"))
+        queryset = filter.qs.values('country').annotate(
+            count=Count("id"),
+            avg_intensity=Avg("intensity"),
+            avg_likelihood=Avg("likelihood"),
+            avg_relevance=Avg("relevance"),
+        )
 
         result = []
         for data in list(queryset):
@@ -115,7 +120,10 @@ class MapDataView(APIView):
                 result.append({
                     "country": country,
                     "code": code,
-                    "count": 0
+                    "count": 0,
+                    "avg_intensity": 0,
+                    "avg_likelihood": 0,
+                    "avg_relevance": 0
                 })
 
         return Response(result)
