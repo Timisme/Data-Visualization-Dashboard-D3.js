@@ -214,7 +214,7 @@ def _get_filter_config(exclude_fields=[], not_null_fields=[]) -> dict:
 
         options.sort()
 
-        filter_config[field_name] = options
+        filter_config[field_name] = {"options": options, "verbose_name": field_name.upper().replace("_", " ")}
 
     return filter_config
 

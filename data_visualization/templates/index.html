@@ -66,11 +66,11 @@
     </nav>
     <!-- Dropdown filter for sector -->
     <div style="display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 20px;">
-        {% for filter_name, filter_options in filter_config.items %}
+        {% for filter_name, config in filter_config.items %}
             <div style="display: flex; flex-direction: column; width: auto;">
-                <label for="{{ filter_name }}-filter" class="text-center">{{ filter_name }}</label>
+                <label for="{{ filter_name }}-filter" class="text-center">{{ config.verbose_name }}</label>
                 <select id="{{ filter_name }}-filter" name="{{ filter_name }}" class="filter selectpicker" data-width="auto">
-                    {% for option_name in filter_options %}
+                    {% for option_name in config.options %}
                         <option value="{{ option_name }}" data-tokens="{{ option_name }}">{{ option_name }}</option>
                     {% endfor %}
                     <option value="All" selected>All</option>
